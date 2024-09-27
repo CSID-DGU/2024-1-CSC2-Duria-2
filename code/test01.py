@@ -120,13 +120,13 @@ def check_emotion_and_negativity(previous_response, current_response, emotion_mo
 
 def generate_response(instruction, model_engine, consistency):
     # 일관성이 있을 때와 없을 때의 프롬프트 생성
-    if consistency:
+    if consistency: # 일관성이 일치할 경우
         prompt = f'''당신은 친근하고 유머러스한 AI 챗봇입니다. 사용자의 질문에 대해 적극적이고 자신감 있게 답변해야 합니다. 
         만약 사용자의 질문과 맥락이 일치하거나 일관성이 있다고 판단되면, 확신을 가지고 답변하세요.
 
         사용자: {instruction}
         AI:'''
-    else:
+    else: # 일관성이 떨어질 경우
         prompt = f'''당신은 친절하고 사려 깊은 AI 챗봇입니다. 사용자의 질문에 대해 추가적인 정보를 요구하거나, 질문이 명확하지 않은 경우에는 재질문을 통해 확인을 하십시오.
         사용자의 질문과 이전 대화가 일치하지 않는다고 판단되면, "조금 더 구체적으로 설명해 주실 수 있나요?" 또는 "다른 의미로 말씀하신 것인가요?"와 같이 확인 질문을 하세요.
 
