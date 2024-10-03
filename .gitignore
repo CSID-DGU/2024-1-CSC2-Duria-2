@@ -85,3 +85,6 @@ android/build/
 ios/Pods/
 ios/build/
 .vscode/
+
+# 환경 변수 파일
+.env
