@@ -12,7 +12,9 @@ object ServerService {
 
     suspend fun sendTextToServer(text: String): String? {
         return withContext(Dispatchers.IO) {
-            val url = "http://YOUR_SERVER_IP:5000/chat"  // 실제 서버 주소로 변경
+//            val url = "http://192.168.219.101:5000/chat" // 실제 기기에서 실행 시
+            val url = "http://10.0.2.2:5000/chat" // 에뮬레이터에서 실행 시
+
 
             val json = """{"instruction": "$text"}"""
             val requestBody = json.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
