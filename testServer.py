@@ -40,8 +40,8 @@ def chat():
         previous_log, similarity_score, time_weight = select_most_similar_conversation(instruction, responses_log)
         if previous_log:
             previous_user_input = previous_log['instruction']
-            previous_emotion, current_emotion = check_emotion_and_negativity(previous_user_input, instruction,
-                                                                             emotion_model, emotion_tokenizer)
+            previous_emotion, current_emotion = check_emotion_and_negativity(
+                previous_user_input, instruction,emotion_model, emotion_tokenizer)
             emotion_change = abs(previous_emotion - current_emotion)
             consistency_score = (similarity_score * 0.8) + (time_weight * 0.15) - (emotion_change * 0.05)
 
@@ -115,24 +115,21 @@ def check_emotion_and_negativity(previous_response, current_response, emotion_mo
 def generate_response(instruction, consistency):
     # 일관성이 있을 때와 없을 때의 프롬프트 생성
     if consistency:
-        prompt = f'''당신은 친근하고 유머러스한 AI 챗봇입니다. 사용자의 질문에 대해 적극적이고 자신감 있게 답변해야 합니다. 
-        만약 사용자의 질문과 맥락이 일치하거나 일관성이 있다고 판단되면, 확신을 가지고 답변하세요.
-
-        사용자: {instruction}
-        AI:'''
+        system_prompt = '''당신은 친근하고 유머러스한 AI 챗봇입니다. 사용자의 질문에 대해 적극적이고 자신감 있게 답변해야 합니다.
+        만약 사용자의 질문과 맥락이 일치하거나 일관성이 있다고 판단되면, 확신을 가지고 답변하세요.'''
+        # 변경 사항: 프롬프트를 system_prompt로 변경하고, instruction은 별도로 전달
     else:
-        prompt = f'''당신은 친절하고 사려 깊은 AI 챗봇입니다. 사용자의 질문에 대해 추가적인 정보를 요구하거나, 질문이 명확하지 않은 경우에는 재질문을 통해 확인을 하십시오.
-        사용자의 질문과 이전 대화가 일치하지 않는다고 판단되면, "조금 더 구체적으로 설명해 주실 수 있나요?" 또는 "다른 의미로 말씀하신 것인가요?"와 같이 확인 질문을 하세요.
-
-        사용자: {instruction}
-        AI:'''
+        system_prompt = '''당신은 친절하고 사려 깊은 AI 챗봇입니다. 사용자의 질문에 대해 추가적인 정보를 요구하거나, 질문이 명확하지 않은 경우에는 재질문을 통해 확인을 하십시오.
+        사용자의 질문과 이전 대화가 일치하지 않는다고 판단되면, "조금 더 구체적으로 설명해 주실 수 있나요?" 또는 "다른 의미로 말씀하신 것인가요?"와 같이 확인 질문을 하세요.'''
+        # 변경 사항: 프롬프트를 system_prompt로 변경하고, instruction은 별도로 전달
 
     try:
         # OpenAI API 호출
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",  # 사용할 모델 선택
             messages=[
-                {"role": "system", "content": prompt}
+                {"role": "system", "content": system_prompt},  # 변경 사항: system_prompt를 system 메시지로 전달
+                {"role": "user", "content": instruction}       # 변경 사항: instruction을 user 메시지로 전달
             ],
             max_tokens=150,
             temperature=0.7,
@@ -141,12 +138,13 @@ def generate_response(instruction, consistency):
             stop=None,
         )
 
-        assistant_reply = response.choices[0].message['content'].strip()
+        assistant_reply = response['choices'][0]['message']['content'].strip()  # 변경 사항: 응답 접근 방식 수정
         return assistant_reply
 
-    except openai.error.OpenAIError as e:
+    except openai.OpenAIError as e:  # 변경 사항: 예외 처리 클래스 변경
         print(f"Error: {e}")
         return "죄송하지만 응답을 생성할 수 없습니다."
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
