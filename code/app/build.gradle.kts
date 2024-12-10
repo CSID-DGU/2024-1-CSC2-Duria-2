@@ -1,44 +1,27 @@
-import java.io.FileInputStream
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.unumunu.myapplication"
-    compileSdk = 34
+    namespace = "com.example.duria"
+    compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.unumunu.myapplication"
-        minSdk = 21
-        targetSdk = 34
+        applicationId = "com.example.duria"
+        minSdk = 27
+        //noinspection EditedTargetSdkVersion
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
 
-        // local.properties에서 변수 가져오기
-        val localProperties = Properties()
-        val localPropertiesFile = rootProject.file("local.properties")
-
-        if (localPropertiesFile.exists()) {
-            try {
-                localProperties.load(FileInputStream(localPropertiesFile))
-            } catch (ex: Exception) {
-                println("Could not load local.properties: ${ex.message}")
-            }
-        }
-
-        val naverClientId: String = localProperties.getProperty("NAVER_CLIENT_ID") ?: ""
-        val naverClientSecret: String = localProperties.getProperty("NAVER_CLIENT_SECRET") ?: ""
-
-        buildConfigField("String", "NAVER_CLIENT_ID", "\"$naverClientId\"")
-        buildConfigField("String", "NAVER_CLIENT_SECRET", "\"$naverClientSecret\"")
+        buildConfigField("String", "NAVER_CLIENT_ID", "\"1234567890\"")
+        buildConfigField("String", "NAVER_CLIENT_SECRET", "\"1234567890\"")
+        buildConfigField("String", "OPENAI_API_KEY", "\"1234567890\"")
     }
 
     buildTypes {
@@ -51,40 +34,39 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
         buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
 }
 
 dependencies {
-    implementation(libs.androidx.appcompat)
+    // 파이어베이스
+    // Firebase BoM
+    implementation (platform(libs.firebase.bom.v3223))
+    // Firebase Analytics
+    implementation (libs.firebase.analytics.ktx)
+    // 필요한 Firebase 라이브러리 추가
+    implementation(libs.google.firebase.database.ktx)
 
     // 코루틴
     implementation(libs.kotlinx.coroutines.android)
 
-    // OkHttp (네트워크 요청)
-    implementation (libs.okhttp.v4100)
+    // OkHttp
+    implementation(libs.okhttp)
 
-    // Moshi (JSON 파싱)
-    implementation(libs.moshi)
-    implementation(libs.moshi.kotlin)
-    implementation(libs.moshi.kotlin.v1130)  // 이 부분이 필요합니다.
 
+
+
+    // JSON 파싱 (org.json 사용)
+
+    // 기본
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -93,11 +75,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
-    // OkHttp 라이브러리 추가
-    implementation(libs.okhttp)
-    implementation(libs.logging.interceptor) // 요청 및 응답 로깅을 원할 경우
-
+    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
